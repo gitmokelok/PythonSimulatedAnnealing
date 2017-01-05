@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>47522b19-9006-4a84-8405-83e80e1304e1</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>PythonSimulatedAnnealing.py</StartupFile>
+    <StartupFile>SA1.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -23,6 +23,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="PythonSimulatedAnnealing.py" />
+    <Compile Include="SA1.py">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
