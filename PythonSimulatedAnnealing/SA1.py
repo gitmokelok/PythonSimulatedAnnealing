@@ -152,6 +152,19 @@ def search(citiesNoDepo, max_temp, temp_change, citiesWithDepo, truckCapacity, c
             print i+1, temp , calculateVrpDistance(bestVrp, citiesWithDepo)
     return bestVrp
 
+def splitVRProuteIntoTruckDroneRoute(vrpRoute, citiesWithDepo):
+    result = dict()
+    for truckRoute in vrpRoute:
+        route1 = truckRoute[0::2]
+        route2 = truckRoute[1::2]
+        if cost(route1, citiesWithDepo) > cost(route2, citiesWithDepo):
+            result['drone{}'.format(vrpRoute.index(truckRoute))] = route1
+            result['truck{}'.format(vrpRoute.index(truckRoute))] = route2
+        else:
+            result['drone{}'.format(vrpRoute.index(truckRoute))] = route2
+            result['truck{}'.format(vrpRoute.index(truckRoute))] = route1
+    return result 
+
 # problem configuration
 
 En22k4_withDepo = [[145,215],[151,264],[159,261],[130,254],[128,252],[163,247],[146,246],[161,242],[142,239],[163,236],[148,232],[128,231],[156,217],[129,214],[146,208],[164,208],[141,206],[147,193],[164,193],[129,189],[155,185],[139,182]]
@@ -177,12 +190,16 @@ max_temp = 100000.0
 temp_change = 0.003
 # execute the algorithm
 best1 = search(En22k4_noDepo, max_temp, temp_change, En22k4_withDepo, En22k4Capacity, En22k4Demand)
-best2 = search(En30k3noDepo, max_temp, temp_change, En30k3, En30k3Capacity, En30k3Demand)
-best3 = search(En51k5noDepo, max_temp, temp_change, En51k5, En51k5Capacity, En51k5Demand)
+#best2 = search(En30k3noDepo, max_temp, temp_change, En30k3, En30k3Capacity, En30k3Demand)
+#best3 = search(En51k5noDepo, max_temp, temp_change, En51k5, En51k5Capacity, En51k5Demand)
+
+
 
 print "Done. Best Solution: c=#{}, v=#{}, number of trucks:{}".format(calculateVrpDistance(best1, En22k4_withDepo), best1, len(best1))
-print "Done. Best Solution: c=#{}, v=#{}, number of trucks:{}".format(calculateVrpDistance(best2, En30k3), best2, len(best2))
-print "Done. Best Solution: c=#{}, v=#{}, number of trucks:{}".format(calculateVrpDistance(best3, En51k5), best3, len(best3))
+#print "Done. Best Solution: c=#{}, v=#{}, number of trucks:{}".format(calculateVrpDistance(best2, En30k3), best2, len(best2))
+#print "Done. Best Solution: c=#{}, v=#{}, number of trucks:{}".format(calculateVrpDistance(best3, En51k5), best3, len(best3))
+
+print splitVRProuteIntoTruckDroneRoute(best1, En22k4_withDepo)
 
 
 #NAME : E-n22-k4
