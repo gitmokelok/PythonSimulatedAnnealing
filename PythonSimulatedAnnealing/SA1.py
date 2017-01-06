@@ -69,19 +69,41 @@ def should_accept(candidate, current, temp, cities):
 def splitTspRoute(permutation_woDepo, truckCapacity, demandList_woDepo, cities_woDepo):
     result = list()
     new_route = list()
-    capacity_counter = 0
+    new_routeCapacity = 0 
     for customer in permutation_woDepo:
-        if capacity_counter <= truckCapacity:
-            capacity_counter += demandList_woDepo[customer]
-            if capacity_counter <= En22k4Capacity:
+        customerDemand = demandList_woDepo[customer]
+        if customer != permutation_woDepo[-1]:
+            if (new_routeCapacity + customerDemand) <= truckCapacity:
+                new_routeCapacity += customerDemand
                 new_route.append(customer)
             else:
-                capacity_counter = 0
-                capacity_counter += demandList_woDepo[customer]
                 result.append(new_route)
-                new_route = [customer]
-        if customer == permutation_woDepo[-1]:
-            result.append(new_route)        
+                new_route = list()
+                new_routeCapacity = 0
+                new_routeCapacity += customerDemand
+                new_route.append(customer)
+        else:
+            if (new_routeCapacity + customerDemand) <= truckCapacity:
+                new_route.append(customer)
+                result.append(new_route)
+            else:
+                result.append(new_route)
+                new_route = list()
+                new_routeCapacity = 0
+                new_route.append(customer)
+                result.append(new_route)
+            
+        #if capacity_counter <= truckCapacity:
+        #    capacity_counter += demandList_woDepo[customer]
+        #    if capacity_counter <= En22k4Capacity:
+        #        new_route.append(customer)
+        #    else:
+        #        capacity_counter = 0
+        #        capacity_counter += demandList_woDepo[customer]
+        #        result.append(new_route)
+        #        new_route = [customer]
+        #if customer == permutation_woDepo[-1]:
+        #    result.append(new_route)        
     return result
 
 def normalize_route(tspRoute):
@@ -94,8 +116,9 @@ def calculateVrpDistance(vrpRoutes, cities_withDepo):
     totalDistance = 0
     for route in vrpRoutes:
         temp = route
-        temp.append(0)
-        temp.insert(0,0)
+        if (temp[-1] != 0 and temp[0] != 0):
+            temp.append(0)
+            temp.insert(0,0)
         totalDistance += cost(temp, cities_withDepo)
     return totalDistance
 
@@ -138,7 +161,15 @@ En22k4Capacity = 6000
 
 
 En30k3 = [[162,354],[218,382],[218,358],[201,370],[214,371],[224,370],[210,382],[104,354],[126,338],[119,340],[129,349],[126,347],[125,346],[116,355],[126,335],[125,355],[119,357],[115,341],[153,351],[175,363],[180,360],[159,331],[188,357],[152,349],[215,389],[212,394],[188,393],[207,406],[184,410],[207,392]]
+En30k3noDepo = [[218,382],[218,358],[201,370],[214,371],[224,370],[210,382],[104,354],[126,338],[119,340],[129,349],[126,347],[125,346],[116,355],[126,335],[125,355],[119,357],[115,341],[153,351],[175,363],[180,360],[159,331],[188,357],[152,349],[215,389],[212,394],[188,393],[207,406],[184,410],[207,392]]
+En30k3Demand = [0,300,3100,125,100,200,150,150,450,300,100,950,125,150,150,550,150,100,150,400,300,1500,100,300,500,800,300,100,150,1000]
+En30k3Capacity = 4500
+
 En51k5 = [[30,40],[37,52],[49,49],[52,64],[20,26],[40,30],[21,47],[17,63],[31,62],[52,33],[51,21],[42,41],[31,32],[5,25],[12,42],[36,16],[52,41],[27,23],[17,33],[13,13],[57,58],[62,42],[42,57],[16,57],[8,52],[7,38],[27,68],[30,48],[43,67],[58,48],[58,27],[37,69],[38,46],[46,10],[61,33],[62,63],[63,69],[32,22],[45,35],[59,15],[5,6],[10,17],[21,10],[5,64],[30,15],[39,10],[32,39],[25,32],[25,55],[48,28],[56,37]]
+En51k5noDepo = [[37,52],[49,49],[52,64],[20,26],[40,30],[21,47],[17,63],[31,62],[52,33],[51,21],[42,41],[31,32],[5,25],[12,42],[36,16],[52,41],[27,23],[17,33],[13,13],[57,58],[62,42],[42,57],[16,57],[8,52],[7,38],[27,68],[30,48],[43,67],[58,48],[58,27],[37,69],[38,46],[46,10],[61,33],[62,63],[63,69],[32,22],[45,35],[59,15],[5,6],[10,17],[21,10],[5,64],[30,15],[39,10],[32,39],[25,32],[25,55],[48,28],[56,37]]
+En51k5Demand = [0,7,30,16,9,21,15,19,23,11,5,19,29,23,21,10,15,3,41,9,28,8,8,16,10,28,7,15,14,6,19,11,12,23,26,17,6,9,15,14,7,27,13,11,16,10,5,25,17,18,10]
+En51k5Capacity = 160
+
 
 # algorithm configuration
 max_iterations = 10000
@@ -146,12 +177,12 @@ max_temp = 100000.0
 temp_change = 0.003
 # execute the algorithm
 best1 = search(En22k4_noDepo, max_temp, temp_change, En22k4_withDepo, En22k4Capacity, En22k4Demand)
-#best2 = search(En30k3, max_iterations, max_temp, temp_change)
-#best3 = search(En51k5, max_iterations, max_temp, temp_change)
+best2 = search(En30k3noDepo, max_temp, temp_change, En30k3, En30k3Capacity, En30k3Demand)
+best3 = search(En51k5noDepo, max_temp, temp_change, En51k5, En51k5Capacity, En51k5Demand)
 
-print "Done. Best Solution: c=#{}, v=#{}".format(calculateVrpDistance(best1, En22k4_withDepo), best1)
-#print "Done. Best Solution: c=#{}, v=#{}".format(cost(best2, En30k3), best2)
-#print "Done. Best Solution: c=#{}, v=#{}".format(cost(best3, En51k5), best3)
+print "Done. Best Solution: c=#{}, v=#{}, number of trucks:{}".format(calculateVrpDistance(best1, En22k4_withDepo), best1, len(best1))
+print "Done. Best Solution: c=#{}, v=#{}, number of trucks:{}".format(calculateVrpDistance(best2, En30k3), best2, len(best2))
+print "Done. Best Solution: c=#{}, v=#{}, number of trucks:{}".format(calculateVrpDistance(best3, En51k5), best3, len(best3))
 
 
 #NAME : E-n22-k4
@@ -162,44 +193,61 @@ print "Done. Best Solution: c=#{}, v=#{}".format(calculateVrpDistance(best1, En2
 #CAPACITY : 6000
 
 
-def splitTspRoute(permutation_woDepo, truckCapacity, demandList_woDepo, cities_woDepo):
-    result = list()
-    new_route = list()
-    capacity_counter = 0
-    for customer in permutation_woDepo:
-        if capacity_counter <= truckCapacity:
-            capacity_counter += demandList_woDepo[customer]
-            if capacity_counter <= En22k4Capacity:
-                new_route.append(customer)
-            else:
-                capacity_counter = 0
-                capacity_counter += demandList_woDepo[customer]
-                result.append(new_route)
-                new_route = [customer]
-        if customer == permutation_woDepo[-1]:
-            result.append(new_route)        
-    return result
+#NAME : E-n30-k3
+#COMMENT : (Christophides and Eilon, Min no of trucks: 3, Optimal value: 534)
+#TYPE : CVRP
+#DIMENSION : 30
+#EDGE_WEIGHT_TYPE : EUC_2D
+#CAPACITY : 4500
 
-def normalize_route(tspRoute):
-    result = list()
-    for customer in tspRoute:
-        result.append(customer+1)
-    return result
+#NAME : E-n51-k5
+#COMMENT : (Christophides and Eilon, Min no of trucks: 5, Optimal value: 521)
+#TYPE : CVRP
+#DIMENSION : 51
+#EDGE_WEIGHT_TYPE : EUC_2D
+#CAPACITY : 160
 
-def calculateVrpDistance(vrpRoutes, cities_withDepo):
-    totalDistance = 0
-    for route in vrpRoutes:
-        temp = route
-        temp.append(0)
-        temp.insert(0,0)
-        totalDistance += cost(temp, cities_withDepo)
-    return totalDistance
+
+
+
+#def splitTspRoute(permutation_woDepo, truckCapacity, demandList_woDepo, cities_woDepo):
+#    result = list()
+#    new_route = list()
+#    capacity_counter = 0
+#    for customer in permutation_woDepo:
+#        if capacity_counter <= truckCapacity:
+#            capacity_counter += demandList_woDepo[customer]
+#            if capacity_counter <= En22k4Capacity:
+#                new_route.append(customer)
+#            else:
+#                capacity_counter = 0
+#                capacity_counter += demandList_woDepo[customer]
+#                result.append(new_route)
+#                new_route = [customer]
+#        if customer == permutation_woDepo[-1]:
+#            result.append(new_route)        
+#    return result
+
+#def normalize_route(tspRoute):
+#    result = list()
+#    for customer in tspRoute:
+#        result.append(customer+1)
+#    return result
+
+#def calculateVrpDistance(vrpRoutes, cities_withDepo):
+#    totalDistance = 0
+#    for route in vrpRoutes:
+#        temp = route
+#        temp.append(0)
+#        temp.insert(0,0)
+#        totalDistance += cost(temp, cities_withDepo)
+#    return totalDistance
                 
-best1 = normalize_route(best1)
-best_Optimal = [[17, 20, 18, 15, 12],[16, 19, 21, 14], [13, 11, 4, 3, 8, 10],[9, 7, 5, 2, 1, 6]] #COST 375
-vrp1routes =  splitTspRoute(best1, En22k4Capacity, En22k4Demand, En22k4_withDepo)
+#best1 = normalize_route(best1)
+#best_Optimal = [[17, 20, 18, 15, 12],[16, 19, 21, 14], [13, 11, 4, 3, 8, 10],[9, 7, 5, 2, 1, 6]] #COST 375
+#vrp1routes =  splitTspRoute(best1, En22k4Capacity, En22k4Demand, En22k4_withDepo)
 
-print calculateVrpDistance(vrp1routes, En22k4_withDepo), vrp1routes
+#print calculateVrpDistance(vrp1routes, En22k4_withDepo), vrp1routes
 
 #for route in best_Optimal:
 #    temp = route
