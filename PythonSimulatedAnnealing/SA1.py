@@ -2,7 +2,7 @@ import math
 import random
 
 from bokeh.plotting import figure, output_file, show
-import bokeh.colors as bColors
+from bokeh.palettes import Spectral11
 
 def euc_2d(c1, c2):
     result = math.sqrt(((c1[0] - c2[0]) ** 2) + ((c1[1] - c2[1]) ** 2))
@@ -158,8 +158,14 @@ def search(citiesNoDepo, max_temp, temp_change, citiesWithDepo, truckCapacity, c
 def splitVRProuteIntoTruckDroneRoute(vrpRoute, citiesWithDepo):
     result = dict()
     for truckRoute in vrpRoute:
-        route1 = truckRoute[::2]
+        route1 = truckRoute[0::2]
         route2 = truckRoute[1::2]
+        if route1[-1] != 0:
+            route1.append(0)
+        if route2[0] != 0:
+            route2.insert(0,0)
+        if route2[-1] != 0:
+            route2.append(0)
         if cost(route1, citiesWithDepo) > cost(route2, citiesWithDepo):
             result['drone{}'.format(vrpRoute.index(truckRoute))] = truckRoute
             result['truck{}'.format(vrpRoute.index(truckRoute))] = route2
@@ -187,10 +193,10 @@ En22k4Capacity = 6000
 '''
 Plotting VRP instance methods
 '''
-def createDepo(p, cities):
+def plotDepo(p, cities):
     p.circle(cities[0][0], cities[0][1], legend="Depo", fill_color="red", line_color="red", size=6)
 
-def createCustomers(p, cities): 
+def plotCustomers(p, cities): 
     customersX = list()
     customersY = list()
     for city in cities[1:]:
@@ -211,21 +217,57 @@ def createPlot(nameOfPlot_string):
 
 def createPlotWithoutRoutes(nameOfPlot_string,vrpInstanceCities):
     p= createPlot(nameOfPlot_string)
-    createDepo(p, vrpInstanceCities)
-    createCustomers(p, vrpInstanceCities)
+    plotDepo(p, vrpInstanceCities)
+    plotCustomers(p, vrpInstanceCities)
     show(p)
    
-createPlotWithoutRoutes('test',En22k4_withDepo)
+def plotVRPRoutes(p, Vrpsolution, vrpInstanceCities):
+    numberOfRoutes = len(Vrpsolution)
+    myPallete = Spectral11[0:numberOfRoutes]
+    myPallete2 = Spectral11[numberOfRoutes:numberOfRoutes*2]
+    for route in Vrpsolution:
+        routeX = list()
+        routeY = list()
+        for city in route:
+            routeX.append(vrpInstanceCities[city][0])
+            routeY.append(vrpInstanceCities[city][1])
+        p.line(routeX, routeY, line_width=2, line_color=myPallete[Vrpsolution.index(route)])
+        p.line(routeX[:2], routeY[:2], line_width=5, line_color=myPallete2[Vrpsolution.index(route)], line_dash="4 4")
 
-def createRoutes(p, Vrpsolution):
-    pass
+def plotVRPTruckDroneRoutes(p, TruckDroneVRPRoutesDictionary, vrpInstanceCities, vrpSolution):
+    numberOfRoutes = len(vrpSolution)
+    myPallete = Spectral11[0:numberOfRoutes]
+    for route in vrpSolution:
+        routeIndex = vrpSolution.index(route)
+        truckRoute = TruckDroneVRPRoutesDictionary['truck{}'.format(routeIndex)]
+        droneRoute = TruckDroneVRPRoutesDictionary['drone{}'.format(routeIndex)]
+        routeX = list()
+        routeY = list()
+        for city in truckRoute:
+            routeX.append(vrpInstanceCities[city][0])
+            routeY.append(vrpInstanceCities[city][1])
+        p.line(routeX, routeY, line_width=2, line_color=myPallete[routeIndex])
+        routeX = list()
+        routeY = list()
+        for city in droneRoute:
+           routeX.append(vrpInstanceCities[city][0])
+           routeY.append(vrpInstanceCities[city][1])
+        p.line(routeX, routeY, line_width=5, line_color=myPallete[routeIndex], line_dash="4 4")
 
 def createPlotWithRoutes(nameOfPlot_string,vrpInstanceCities, VRPsolution):
     p = createPlot(nameOfPlot_string)
-    createDepo(p, vrpInstanceCities)
-    createCustomers(p, vrpInstanceCities)
-    createRoutes(p, VRPsolution, vrpInstanceCities)
+    plotDepo(p, vrpInstanceCities)
+    plotCustomers(p, vrpInstanceCities)
+    plotVRPRoutes(p, VRPsolution, vrpInstanceCities)
     show(p)
+
+def createPlotWithTruckDroneRoutes(nameOfPlot_string,vrpInstanceCities, VRPsolution, TruckDroneVRPRoutesDictionary):
+    p = createPlot(nameOfPlot_string)
+    plotDepo(p, vrpInstanceCities)
+    plotCustomers(p, vrpInstanceCities)
+    plotVRPTruckDroneRoutes(p, TruckDroneVRPRoutesDictionary, vrpInstanceCities, VRPsolution)
+    show(p)
+
 # add some renderers
 #p.line(x1, y1, line_width=1, line_color="orange")
 #p.line(x2, y2, line_width=1, line_color="green")
@@ -257,20 +299,22 @@ En51k5Capacity = 160
 
 
 # algorithm configuration
-#max_iterations = 10000
-#max_temp = 100000.0
-#temp_change = 0.003
+max_iterations = 10000
+max_temp = 100000.0
+temp_change = 0.003
 # execute the algorithm
-#best1 = search(En22k4_noDepo, max_temp, temp_change, En22k4_withDepo, En22k4Capacity, En22k4Demand)
+best1 = search(En22k4_noDepo, max_temp, temp_change, En22k4_withDepo, En22k4Capacity, En22k4Demand)
 #best2 = search(En30k3noDepo, max_temp, temp_change, En30k3, En30k3Capacity, En30k3Demand)
 #best3 = search(En51k5noDepo, max_temp, temp_change, En51k5, En51k5Capacity, En51k5Demand)
 
-#print "Done. Best Solution: c=#{}, v=#{}, number of trucks:{}".format(calculateVrpDistance(best1, En22k4_withDepo), best1, len(best1))
+print "Done. Best Solution: c=#{}, v=#{}, number of trucks:{}".format(calculateVrpDistance(best1, En22k4_withDepo), best1, len(best1))
 #print "Done. Best Solution: c=#{}, v=#{}, number of trucks:{}".format(calculateVrpDistance(best2, En30k3), best2, len(best2))
 #print "Done. Best Solution: c=#{}, v=#{}, number of trucks:{}".format(calculateVrpDistance(best3, En51k5), best3, len(best3))
+#createPlotWithRoutes("firstTest",En22k4_withDepo,best1)
 
-#print splitVRProuteIntoTruckDroneRoute(best1, En22k4_withDepo)
+vrpDict = splitVRProuteIntoTruckDroneRoute(best1, En22k4_withDepo)
 
+createPlotWithTruckDroneRoutes('firstTest',En22k4_withDepo, best1, vrpDict)
 
 #NAME : E-n22-k4
 #COMMENT : (Christophides and Eilon, Min no of trucks: 4, Optimal value: 375)
