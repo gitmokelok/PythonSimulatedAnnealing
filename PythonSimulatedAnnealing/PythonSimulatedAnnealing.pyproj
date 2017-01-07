@@ -26,6 +26,15 @@
     <Compile Include="SA1.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="testing_functions.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="VRPPlot.py">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="En22k4_VRP\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
