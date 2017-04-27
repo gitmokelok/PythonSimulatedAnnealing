@@ -29,12 +29,41 @@
     <Compile Include="testing_functions.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="vrpParser.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="VRPPlot.py">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="En22k4_VRP\" />
+    <Folder Include="Vrp-Set-E\" />
+    <Folder Include="Vrp-Set-E\E\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Vrp-Set-E\E\E-n101-k14.opt" />
+    <Content Include="Vrp-Set-E\E\E-n101-k14.vrp" />
+    <Content Include="Vrp-Set-E\E\E-n101-k8.opt" />
+    <Content Include="Vrp-Set-E\E\E-n101-k8.vrp" />
+    <Content Include="Vrp-Set-E\E\E-n22-k4.opt" />
+    <Content Include="Vrp-Set-E\E\E-n22-k4.vrp" />
+    <Content Include="Vrp-Set-E\E\E-n23-k3.opt" />
+    <Content Include="Vrp-Set-E\E\E-n23-k3.vrp" />
+    <Content Include="Vrp-Set-E\E\E-n30-k3.opt" />
+    <Content Include="Vrp-Set-E\E\E-n30-k3.vrp" />
+    <Content Include="Vrp-Set-E\E\E-n33-k4.opt" />
+    <Content Include="Vrp-Set-E\E\E-n33-k4.vrp" />
+    <Content Include="Vrp-Set-E\E\E-n51-k5.opt" />
+    <Content Include="Vrp-Set-E\E\E-n51-k5.vrp" />
+    <Content Include="Vrp-Set-E\E\E-n76-k10.opt" />
+    <Content Include="Vrp-Set-E\E\E-n76-k10.vrp" />
+    <Content Include="Vrp-Set-E\E\E-n76-k14.opt" />
+    <Content Include="Vrp-Set-E\E\E-n76-k14.vrp" />
+    <Content Include="Vrp-Set-E\E\E-n76-k7.opt" />
+    <Content Include="Vrp-Set-E\E\E-n76-k7.vrp" />
+    <Content Include="Vrp-Set-E\E\E-n76-k8.opt" />
+    <Content Include="Vrp-Set-E\E\E-n76-k8.vrp" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
